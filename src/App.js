@@ -7,6 +7,8 @@ import './App.css';
 import initialData from "./data.json"
 
 var appTitle = "Nord Software"
+// https://regex101.com/r/QXAhGV/1
+var phoneCheck = new RegExp(/^(\+{0,})(\d{0,})([(]{1}\d{1,3}[)]{0,}){0,}(\s?\d+|\+\d{2,3}\s{1}\d+|\d+){1}[\s|-]?\d+([\s|-]?\d+){1,2}(\s){0,}$/gm)
 
 class App extends React.Component {
   constructor(props) {
@@ -32,6 +34,11 @@ class App extends React.Component {
     if(!obj.name) { errors.name="Cannot be empty"}
     if(!obj.email) { errors.email="Cannot be empty"}
     else if(obj.email.indexOf("@")<1) { errors.email="Invalid e-mail address"}
+    if(obj.phone) {
+      if(!phoneCheck.test(obj.phone)) {
+        errors.phone="Invalid phone number"
+      }
+    }
     return errors;
   }
 
