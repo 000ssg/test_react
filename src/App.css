@@ -1,0 +1,215 @@
+.App {
+  min-width: 912px;
+  text-align: left;
+  background-color: rgb(241,241,241);
+}
+
+.App-logo {
+  display: flex;
+  margin: 32px 32px 32px 32px;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+
+.App-title {
+  margin-top: 30px;
+  font-size: 24pt;
+}
+
+.App-header {
+  background-color:  rgb(173,181,189);
+  height: 96px;
+  display: flex;
+  flex-direction: row;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-body {
+  margin: auto;
+  width: 916px;
+  min-height: 300px;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+
+.Participants {
+  width: 916px;
+  align-items: center;
+  justify-content: center;
+}
+
+.Item-title {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  color: rgb(117,117,117);
+  font-size: 24pt;
+}
+
+.Table {
+  width: 100%;
+  border-spacing: 0;
+  border: 1px solid rgb(241,241,241);
+}
+
+.TrH {
+  background-color: rgb(255,255,255);
+  height: 48px;
+  font-size: 24pt;
+}
+
+.Th {
+  padding-left: 24px;
+  border-bottom: 1px solid rgb(241,241,241);
+  font-weight: 300;
+}
+
+.ThCell {
+  height: 16px;
+  vertical-align: middle;
+  text-align: left;
+  color: #757575;
+  font-size: 14pt;
+  font-weight: 500;
+}
+
+.TrD {
+  background-color: rgb(255,255,255);
+  height: 72px;
+}
+
+.TdD {
+  padding-left: 24px;
+  border-bottom: 1px solid rgb(241,241,241);
+}
+
+.TdA {
+  font-size: 12pt;
+  border-bottom: 1px solid rgb(241,241,241);
+  align-content: flex-end;
+}
+
+.TdCell {
+  height: 24px;
+  vertical-align: middle;
+  text-align: left;
+  color: #505050;
+  font-size: 16pt;
+  font-weight: 400;
+}
+
+.IACell {
+  display: flex;
+  flex-direction: row;
+  align-content: flex-end;
+  margin-left: auto;
+}
+
+.TdAButton {
+  display: flex;
+  flex-direction: row;
+  align-content: flex-end;
+  margin-left: auto;
+  border: none;
+  background-color: rgba(0,0,0,0)
+}
+
+.TdAIcon {
+  display: flex;
+  border: white thin solid;
+  margin-left: auto;
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+
+.TrA {
+  background-color: rgb(255,255,255);
+  height: 72px;
+}
+
+.TdAA {
+  padding-top: 16px;;
+  padding-bottom: 16px;;
+  padding-left: 16px;
+  border-bottom: 16px solid rgb(241,241,241);
+  white-space: nowrap;
+}
+
+.ACell {
+  display: flex;
+  flex-direction: row;
+  align-content: flex-end;
+}
+
+.AButton {
+  margin-right: 16px;
+  height: 40px;
+  border: 0px;
+  width: 100%;
+  font-size: 16pt;
+  text-align: center;
+  vertical-align: middle;
+  color: rgb(117,117,117);
+  background-color: rgb(237,237,237);
+}
+
+.AInput {
+  font-size: 14pt;
+  width: 100%;
+  height: 36px;
+  background-color: rgb(250,250,250);
+  border: thin solid rgb(238,238,238);
+}
+
+.TrE {
+  background-color: rgb(255,255,255);
+  height: 72px;
+}
+
+.TdE {
+  padding-top: 16px;;
+  padding-bottom: 16px;;
+  padding-left: 16px;
+  border-top: 16px solid rgb(241,241,241);
+  border-bottom: 16px solid rgb(241,241,241);
+  white-space: nowrap;
+}
+
+.ECButton {
+  margin-right: 8px;
+  height: 40px;
+  border: 0px;
+  width: 100%;
+  font-size: 16pt;
+  text-align: center;
+  vertical-align: middle;
+  color: #0cf;
+  background-color: rgb(237,237,237);
+}
+
+.ESButton {
+  margin-right: 8px;
+  height: 40px;
+  border: 0px;
+  width: 100%;
+  font-size: 16pt;
+  text-align: center;
+  vertical-align: middle;
+  color: #ffffff;
+  background-color: #0cf;
+}
+
+.EInput {
+  font-size: 14pt;
+  width: 100%;
+  height: 36px;
+  background-color: rgb(250,250,250);
+  border: thin solid rgb(238,238,238);
+}
