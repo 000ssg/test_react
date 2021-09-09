@@ -13,7 +13,7 @@ Build production version of application
 ### `npm run build`
 
 ## Description of app
-Application load predefined set of participants (hardcoded) and allows to view and modify it.
+On start (window open) application loads predefined set of participants (hardcoded) and allows to view and modify it.
 
 Click on table headers to sort.
 
