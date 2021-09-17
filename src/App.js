@@ -68,13 +68,12 @@ class App extends React.Component {
         .reduce((acc, val) => val > acc ? val : acc) + 1;
 
       this.setState({
-        data: this.state.data.map(item => item)
-          .push({
-            id: "" + newId,
-            name: this.state.add.name,
-            email: this.state.add.email,
-            phone: this.state.add.phone
-          }),
+        data: this.state.data.concat({
+          id: "" + newId,
+          name: this.state.add.name,
+          email: this.state.add.email,
+          phone: this.state.add.phone
+        }),
         add: { name: "", email: "", phone: "" },
         modify: { id: "", name: "", email: "", phone: "" },
         addErrors: {}
@@ -93,7 +92,11 @@ class App extends React.Component {
     console.log("select: " + event.target.value)
     const mId = event.target.value
     const m = this.state.data.find(item => item.id === mId)
+    if (m) {
+      m.isEditing = true
+    }
     this.setState({
+      //data: this.state.data.map(item => item),
       modify: {
         id: m ? m.id : "",
         name: m ? m.name : "",
@@ -184,17 +187,14 @@ class App extends React.Component {
 
     if (!(errors.name || errors.email || errors.phone)) {
       if (m) {
-        var d = []
-        this.state.data.forEach(element => {
-          if (element.id === m.id) {
-            console.log("modified: " + mId)
-            d.push({ id: this.state.modify.id, name: this.state.modify.name, email: this.state.modify.email, phone: this.state.modify.phone });
-          } else d.push(element)
-        });
+        console.log("modified: " + mId)
+        m.name = this.state.modify.name;
+        m.email = this.state.modify.email;
+        m.phone = this.state.modify.phone;
+        m.isEditing = false;
       }
-      console.log("data: " + JSON.stringify(d))
+
       this.setState({
-        data: d,
         modify: { id: "", name: "", email: "", phone: "" },
         modifyErrors: {}
       })
@@ -390,32 +390,35 @@ function Table(props) {
               rows.map(row => {
                 // Prepare the row for display
                 prepareRow(row)
-                return (
-                  // Apply the row props
-                  <tr className={modify && modify.is === row.values.id ? "TrD" : "TrE"} {...row.getRowProps()}>
-                    {// Loop over the rows cells
-                      (modify && modify.is === row.values.id)
-                        ? <Fragment>
-                          <td className="TdE">
-                            <input className="EInput" name="oldName" size="12" placeholder="Full name" value={modify.name} onChange={handleChange}></input>
-                            {modifyErrors.name ? <span style={{ color: "red" }}><br />{modifyErrors.name}</span> : ""}
-                          </td>
-                          <td className="TdE">
-                            <input className="EInput" name="oldEmail" size="12" placeholder="E-mail address" value={modify.email} onChange={handleChange}></input>
-                            {modifyErrors.email ? <span style={{ color: "red" }}><br />{modifyErrors.email}</span> : ""}
-                          </td>
-                          <td className="TdE">
-                            <input className="EInput" name="oldPhone" size="12" placeholder="Phone number" value={modify.phone} onChange={handleChange}></input>
-                            {modifyErrors.phone ? <span style={{ color: "red" }}><br />{modifyErrors.phone}</span> : ""}
-                          </td>
-                          <td className="TdE" valign="middle">
-                            <div className="ACell">
-                              <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
-                              <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
-                            </div>
-                          </td>
-                        </Fragment>
-                        :
+                const isEditRow = modify && modify.id === row.values.id
+                if (isEditRow) {
+                  return (
+                    <tr className="TrE" {...row.getRowProps()}>
+                      <td className="TdE">
+                        <input className="EInput" name="oldName" size="12" placeholder="Full name" value={modify.name} onChange={handleChange}></input>
+                        {modifyErrors.name ? <span style={{ color: "red" }}><br />{modifyErrors.name}</span> : ""}
+                      </td>
+                      <td className="TdE">
+                        <input className="EInput" name="oldEmail" size="12" placeholder="E-mail address" value={modify.email} onChange={handleChange}></input>
+                        {modifyErrors.email ? <span style={{ color: "red" }}><br />{modifyErrors.email}</span> : ""}
+                      </td>
+                      <td className="TdE">
+                        <input className="EInput" name="oldPhone" size="12" placeholder="Phone number" value={modify.phone} onChange={handleChange}></input>
+                        {modifyErrors.phone ? <span style={{ color: "red" }}><br />{modifyErrors.phone}</span> : ""}
+                      </td>
+                      <td className="TdA" valign="middle">
+                        <div className="ACell">
+                        
+                          <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
+                          <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
+                        </div>
+                      </td>
+                    </tr>)
+                } else
+                  return (
+                    // Apply the row props
+                    <tr className="TrD" {...row.getRowProps()}>
+                      {// Loop over the rows cells
                         row.cells.map(cell => {
                           // Apply the cell props
                           return (
@@ -425,40 +428,34 @@ function Table(props) {
                             </td>
                           )
                         })}
-                    <td className="TdA">
-                      <div className="IACell">
-                        <button className="TdAButton" onClick={handleSelect} value={row.values.id}><img src={editIcon} className="TdAIcon" alt="edit" /></button>
-                        <button className="TdAButton" onClick={handleDelete} value={row.values.id}><img src={deleteIcon} className="TdAIcon" alt="delete" /></button>
-                      </div>
-                    </td>
-                  </tr>
-                )
+                      <td className="TdA">
+                        <div className="IACell">
+                          <button className="TdAEButton" onClick={handleSelect} value={row.values.id}><img src={editIcon} className="TdAIcon" alt="edit" /></button>
+                          <button className="TdADButton" onClick={handleDelete} value={row.values.id}><img src={deleteIcon} className="TdAIcon" alt="delete" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
               })}
-            {(1 === 0) ? (
-              <tr className="TrE">
-                <td className="TdE">
-                  <input className="EInput" name="oldName" size="12" placeholder="Full name" value={modify.name} onChange={handleChange}></input>
-                  {modifyErrors.name ? <span style={{ color: "red" }}><br />{modifyErrors.name}</span> : ""}
-                </td>
-                <td className="TdE">
-                  <input className="EInput" name="oldEmail" size="12" placeholder="E-mail address" value={modify.email} onChange={handleChange}></input>
-                  {modifyErrors.email ? <span style={{ color: "red" }}><br />{modifyErrors.email}</span> : ""}
-                </td>
-                <td className="TdE">
-                  <input className="EInput" name="oldPhone" size="12" placeholder="Phone number" value={modify.phone} onChange={handleChange}></input>
-                  {modifyErrors.phone ? <span style={{ color: "red" }}><br />{modifyErrors.phone}</span> : ""}
-                </td>
-                <td className="TdE" valign="middle">
-                  <div className="ACell">
-                    <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
-                    <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
-                  </div>
-                </td>
-              </tr>) : ("")}
           </tbody>
         </table>        </div>
     </div>
   );
+}
+
+function drawEditCell(name, title, value, handler, error, tdStyle, inputStyle) {
+  <td className={tdStyle}>
+    <input className={inputStyle} name={name} size="12" placeholder={title} value={value} onChange={handler}></input>
+    {error ? <span style={{ color: "red" }}><br />{error}</span> : ""}
+  </td>
+}
+function drawEditActions(handleCancel, handleSave) {
+  <td className="TdE" valign="middle">
+    <div className="ACell">
+      <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
+      <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
+    </div>
+  </td>
 }
 
 export default App;
