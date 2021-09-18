@@ -8,7 +8,7 @@ import initialData from "./data.json"
 
 var appTitle = "Nord Software"
 // https://regex101.com/r/QXAhGV/1
-const phoneCheck = new RegExp(/^(\+{0,})(\d{0,})([(]{1}\d{1,3}[)]{0,}){0,}(\s?\d+|\+\d{2,3}\s{1}\d+|\d+){1}[\s|-]?\d+([\s|-]?\d+){1,2}(\s){0,}$/gm)
+const phoneCheck = new RegExp(/^(\+{0,})(\d{0,})([(]{1}\d{1,3}[)]{0,}){0,}(\s?\d+|\+\d{2,3}\s{1}\d+|\d+){1}[\s|-]?\d+([\s|-]?\d+){1,2}(\s){0,}$/m);
 
 class App extends React.Component {
   constructor(props) {
@@ -195,6 +195,7 @@ class App extends React.Component {
       }
 
       this.setState({
+        data: m ? this.state.data.slice(0,this.state.data.length) : this.state.data,
         modify: { id: "", name: "", email: "", phone: "" },
         modifyErrors: {}
       })
@@ -218,6 +219,7 @@ class App extends React.Component {
     console.log("cancel: " + event.target.value)
     this.setState({
       modify: { id: "", name: "", email: "", phone: "" },
+      modifyErrors: {}
     })
   }
 
@@ -236,29 +238,15 @@ class App extends React.Component {
         } else d.push(element)
       });
     }
-    console.log("data: " + JSON.stringify(d))
     this.setState({
       data: this.state.data.filter(a => mId != a.id),
       modify: { id: "", name: "", email: "", phone: "" },
+      modifyErrors: {}
     })
     this.saveData()
   }
 
-  dump(obj) {
-    var s = typeof (obj);
-    for (var i in obj) {
-      s += "\n  " + i + ": " + obj[i]
-      if ("target" === i) {
-        s += "\n    " + this.dump(obj[i])
-      }
-    }
-    return s;
-  }
-
   render() {
-    console.log("render data: " + JSON.stringify(this.state.data))
-    console.log("render modify: " + JSON.stringify(this.state.modify))
-    console.log("render add: " + JSON.stringify(this.state.add))
     const data = this.state.data;
     const modify = this.state.modify;
     const add = this.state.add;
@@ -346,18 +334,18 @@ function Table(props) {
         <table className="Table" {...getTableProps()}>
           <thead>
             <tr className="TrA">
-              <td className="TdAA">
-                <input className="AInput" name="newName" size="12" placeholder="Full name" value={add.name} onChange={handleChange}></input>
-                {addErrors.name ? <span style={{ color: "red" }}><br />{addErrors.name}</span> : ""}
-              </td>
-              <td className="TdAA">
-                <input className="AInput" name="newEmail" size="12" placeholder="E-mail address" value={add.email} onChange={handleChange}></input>
-                {addErrors.email ? <span style={{ color: "red" }}><br />{addErrors.email}</span> : ""}
-              </td>
-              <td className="TdAA">
-                <input className="AInput" name="newPhone" size="12" placeholder="Phone number" value={add.phone} onChange={handleChange}></input>
-                {addErrors.phone ? <span style={{ color: "red" }}><br />{addErrors.phone}</span> : ""}
-              </td>
+              <DrawEditCell name="newName" title="Full name"
+                value={add.name} handler={handleChange} error={addErrors.name}
+                tdStyle="TdAA" inputStyle="AInput"
+              />
+              <DrawEditCell name="newEmail" title="E-mail address"
+                value={add.email} handler={handleChange} error={addErrors.email}
+                tdStyle="TdAA" inputStyle="AInput"
+              />
+              <DrawEditCell name="newPhone" title="Phone number"
+                value={add.phone} handler={handleChange} error={addErrors.phone}
+                tdStyle="TdAA" inputStyle="AInput"
+              />
               <td className="TdAA" valign="middle">
                 <div className="ACell">
                   <input type="button" className="AButton" value="Add new" onClick={handleAdd}></input>
@@ -394,21 +382,20 @@ function Table(props) {
                 if (isEditRow) {
                   return (
                     <tr className="TrE" {...row.getRowProps()}>
-                      <td className="TdE">
-                        <input className="EInput" name="oldName" size="12" placeholder="Full name" value={modify.name} onChange={handleChange}></input>
-                        {modifyErrors.name ? <span style={{ color: "red" }}><br />{modifyErrors.name}</span> : ""}
-                      </td>
-                      <td className="TdE">
-                        <input className="EInput" name="oldEmail" size="12" placeholder="E-mail address" value={modify.email} onChange={handleChange}></input>
-                        {modifyErrors.email ? <span style={{ color: "red" }}><br />{modifyErrors.email}</span> : ""}
-                      </td>
-                      <td className="TdE">
-                        <input className="EInput" name="oldPhone" size="12" placeholder="Phone number" value={modify.phone} onChange={handleChange}></input>
-                        {modifyErrors.phone ? <span style={{ color: "red" }}><br />{modifyErrors.phone}</span> : ""}
-                      </td>
+                      <DrawEditCell name="oldName" title="Full name"
+                        value={modify.name} handler={handleChange} error={modifyErrors.name}
+                        tdStyle="TdE" inputStyle="EInput"
+                      />
+                      <DrawEditCell name="oldEmail" title="E-mail address"
+                        value={modify.email} handler={handleChange} error={modifyErrors.email}
+                        tdStyle="TdE" inputStyle="EInput"
+                      />
+                      <DrawEditCell name="oldPhone" title="Phone number"
+                        value={modify.phone} handler={handleChange} error={modifyErrors.phone}
+                        tdStyle="TdE" inputStyle="EInput"
+                      />
                       <td className="TdA" valign="middle">
                         <div className="ACell">
-                        
                           <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
                           <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
                         </div>
@@ -443,19 +430,18 @@ function Table(props) {
   );
 }
 
-function drawEditCell(name, title, value, handler, error, tdStyle, inputStyle) {
-  <td className={tdStyle}>
-    <input className={inputStyle} name={name} size="12" placeholder={title} value={value} onChange={handler}></input>
-    {error ? <span style={{ color: "red" }}><br />{error}</span> : ""}
-  </td>
-}
-function drawEditActions(handleCancel, handleSave) {
-  <td className="TdE" valign="middle">
-    <div className="ACell">
-      <input type="button" className="ECButton" value="Cancel" onClick={handleCancel}></input>
-      <input type="button" className="ESButton" value="Save" onClick={handleSave}></input>
-    </div>
-  </td>
+/**
+ * name, title, value, handler, error, tdStyle, inputStyle
+ * @param {*} props 
+ * @returns 
+ */
+function DrawEditCell(props) {
+  return (
+    <td className={props.tdStyle}>
+      <input className={props.inputStyle} name={props.name} size="12" placeholder={props.title} value={props.value} onChange={props.handler}></input>
+      {props.error ? <span style={{ color: "red" }}><br />{props.error}</span> : ""}
+    </td>
+  )
 }
 
 export default App;
