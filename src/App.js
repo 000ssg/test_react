@@ -88,6 +88,10 @@ class App extends React.Component {
     }
   }
 
+  /**
+   * inline editing row selection
+   * @param {*} event 
+   */
   handleSelect(event) {
     console.log("select: " + event.target.value)
     const mId = event.target.value
@@ -195,7 +199,7 @@ class App extends React.Component {
       }
 
       this.setState({
-        data: m ? this.state.data.slice(0,this.state.data.length) : this.state.data,
+        data: m ? this.state.data.slice(0, this.state.data.length) : this.state.data,
         modify: { id: "", name: "", email: "", phone: "" },
         modifyErrors: {}
       })
@@ -230,14 +234,6 @@ class App extends React.Component {
   handleDelete(event) {
     console.log("delete: " + event.target.value)
     const mId = event.target.value
-    const m = this.state.data.find(item => item.id === mId)
-    if (m) {
-      var d = []
-      this.state.data.forEach(element => {
-        if (element.id === m.id) {
-        } else d.push(element)
-      });
-    }
     this.setState({
       data: this.state.data.filter(a => mId != a.id),
       modify: { id: "", name: "", email: "", phone: "" },
