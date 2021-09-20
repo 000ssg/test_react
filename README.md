@@ -19,6 +19,6 @@ Click on table headers to sort.
 
 Enter data and click on "Add new" to append participant.
 
-Click on "edit" pen near participant to see/modify data inline (<b>NOTE</b>: on selection of another row no warnings, any changes lost and another line is edited!).
+Click on "edit" pen near participant to see/modify data inline (<b>NOTE</b>: on selection of another row no warnings, any changes are lost and another line is edited!).
 
 Click on "delete" icon of participant to immediately delete participant (<b>NOTE</b>: no warnings, just delete)
