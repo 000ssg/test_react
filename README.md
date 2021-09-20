@@ -23,4 +23,4 @@ Click on "edit" pen near participant to see/modify data inline (<b>NOTE</b>: on 
 
 Click on "delete" icon of participant to immediately delete participant (<b>NOTE</b>: no warnings, just delete)
 
-Source changes: javascrip: applied functional style, UI: adapted to expected view/behaviour.
+Source changes: javascript: applied functional style, UI: adapted to expected view/behaviour.
