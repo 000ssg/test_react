@@ -16,7 +16,7 @@
   {"id":"15", "name":"A15 B C", "email": "a15@a", "phone": "+358000000015"},
   {"id":"16", "name":"A16 B C", "email": "a16@a", "phone": "+358000000016"},
   {"id":"17", "name":"A17 B C", "email": "a17@a", "phone": "+358000000017"},
-  {"id":"17", "name":"A18 B C", "email": "a18@a", "phone": "+358000000018"},
+  {"id":"18", "name":"A18 B C", "email": "a18@a", "phone": "+358000000018"},
   {"id":"19", "name":"A19 B C", "email": "a19@a", "phone": "+358000000019"},
   {"id":"20", "name":"A20 B C", "email": "a20@a", "phone": "+358000000020"} 
 ]
