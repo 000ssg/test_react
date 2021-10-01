@@ -18,7 +18,7 @@ class App extends React.Component {
       data: initialData, // table data
       add: { name: "", email: "", phone: "" }, // new entry data
       addErrors: {}, // new entry errors
-      modify: { id: "", name: "", email: "", phone: "" }, // editing entry data
+      modify: {},
       modifyErrors: {}, // editing entry errors
     }
 
@@ -36,7 +36,7 @@ class App extends React.Component {
    * @returns 
    */
   validateInput(obj) {
-    let errors = {}
+    const errors = {}
 
     // simulate empty if none
     if (!obj) obj = {}
@@ -62,13 +62,12 @@ class App extends React.Component {
   }
 
   /**
-   * Add new participant if valid entry and clean add/modify fields
+   * Add new participant if valid entry and clean add fields
    * @param {*} event 
    */
   handleAdd(event) {
-    console.debug("adding: " + event)
-    event.preventDefault();
-    let errors = this.validateInput(this.state.add)
+    console.debug("adding: " + event.target.value + ", " + JSON.stringify(this.state.add))
+    const errors = this.validateInput(this.state.add)
     const hasError = errors.name || errors.email || errors.phone;
     if (this.state.add && !hasError) {
       // eval next id
@@ -100,11 +99,11 @@ class App extends React.Component {
    */
   handleSelect(event) {
     console.debug("select: " + event.target.value)
-    const mId = event.target.value
-    const m = this.state.data.find(item => item.id === mId)
-    if (m) {
+    const itemId = event.target.value
+    const item = this.state.data.find(item => item.id === itemId)
+    if (item) {
       this.setState({
-        modify: Object.assign({}, m),
+        modify: Object.assign({}, item),
         modifyErrors: {},
       })
     }
@@ -117,16 +116,18 @@ class App extends React.Component {
    */
   handleChange(event) {
     console.debug("change: " + event.target.name + ", " + event.target.value)
-    event.preventDefault();
-    const [itemName, fieldName] = event.target.name.split(":");
+    const [entryName, fieldName] = event.target.name.split(":");
 
-    if (itemName && fieldName) {
-      switch (itemName) {
+    if (entryName && fieldName) {
+      switch (entryName) {
         case "add":
         case "modify":
-          const obj = Object.assign({}, this.state[itemName]);
-          obj[fieldName] = event.target.value;
-          this.setState({ [itemName]: obj })
+          const entry = Object.assign({}, this.state[entryName]);
+          entry[fieldName] = event.target.value;
+          this.setState({ [entryName]: entry })
+          break;
+        default:
+          console.warn("unsupported entry: " + entryName);
           break;
       }
     }
@@ -134,35 +135,34 @@ class App extends React.Component {
 
   /**
    * Save changes for modified entry, if valid.
-   * Uses target name in form: "<action>:<id>" (to enable multi-row editing if desired)
+   * Uses target name in form: "<action>:<id>" (id -> to enable multi-row editing if desired)
    * @param {*} event 
    */
   handleSave(event) {
     console.debug("save: " + event.target.value + "/" + event.target.name)
-    const [, mId] = event.target.name.split(":");
-    const m = mId === this.state.modify.id
-      ? this.state.data.find(item => item.id === mId)
+    const [, itemId] = event.target.name.split(":");
+    const item = itemId === this.state.modify.id
+      ? this.state.data.find(item => item.id === itemId)
       : null;
 
-    let errors = this.validateInput(this.state.modify)
+    const errors = this.validateInput(this.state.modify)
     const hasError = errors.name || errors.email || errors.phone;
 
     if (!hasError) {
-      if (m) {
-        console.debug("modified: " + mId)
-        Object.assign(m, this.state.modify);
+      if (item) {
+        console.debug("modified: " + itemId); //+" "+JSON.stringify(item) +" -> "+JSON.stringify(this.state.modify))
+        Object.assign(item, this.state.modify);
 
         this.setState({
           data: this.state.data.slice(),
-          modify: { id: "", name: "", email: "", phone: "" },
+          modify: {},
           modifyErrors: {},
         })
         this.saveData()
       }
     } else {
-      if (m) {
+      if (item) {
         this.setState({
-          // data: this.state.data.slice(),
           modifyErrors: errors
         })
       }
@@ -171,19 +171,19 @@ class App extends React.Component {
 
   /**
    * Cancel entry modification
-   * Uses target name in form: "<action>:<id>" (to enable multi-row editing if desired)
+   * Uses target name in form: "<action>:<id>" (id -> to enable multi-row editing if desired)
    * @param {*} event 
    */
   handleCancel(event) {
     console.debug("cancel: " + event.target.value + "/" + event.target.name)
     const [, itemId] = event.target.name.split(":");
-    let m = mId === this.state.modify.id
+    const item = itemId === this.state.modify.id
       ? this.state.data.find(item => item.id === itemId)
       : null;
 
-    if (m && this.state.modify.id === m.id) {
+    if (item) {
       this.setState({
-        modify: { id: "", name: "", email: "", phone: "" },
+        modify: {},
         modifyErrors: {},
       })
     }
@@ -195,10 +195,10 @@ class App extends React.Component {
    */
   handleDelete(event) {
     console.debug("delete: " + event.target.value)
-    const mId = event.target.value
+    const itemId = event.target.value
     this.setState({
-      data: this.state.data.filter(a => mId !== a.id),
-      modify: { id: "", name: "", email: "", phone: "" },
+      data: this.state.data.filter(a => itemId !== a.id),
+      modify: {},
       modifyErrors: {},
     })
     this.saveData()
@@ -270,15 +270,11 @@ function Table(props) {
         Header: 'Phone number',
         accessor: 'phone',
       },
-      {
-        Header: 'edit',
-        accessor: 'edit',
-      },
     ],
     []
   );
 
-  const initialState = { hiddenColumns: ['id', 'edit'] };
+  const initialState = { hiddenColumns: ['id'] };
 
   const tableInstance = useTable({ columns, data, initialState, autoResetSortBy: false }, useSortBy);
   const {
