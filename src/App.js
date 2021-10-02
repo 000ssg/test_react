@@ -73,7 +73,7 @@ class App extends React.Component {
       // eval next id
       const newId = this.state.data
         .map(item => parseInt("" + item.id))
-        .reduce((acc, val) => val > acc ? val : acc) + 1;
+        .reduce((acc, val) => val > acc ? val : acc, 0) + 1;
 
       this.setState({
         data: this.state.data.concat({
