@@ -414,10 +414,19 @@ function DrawTableRow(props) {
  * @returns 
  */
 function DrawEditCell(props) {
+  const {
+    tdStyle,
+    inputStyle,
+    name,
+    title,
+    value,
+    handler,
+    error
+  } = props;
   return (
-    <td className={props.tdStyle}>
-      <input className={props.inputStyle} name={props.name} size="12" placeholder={props.title} value={props.value} onChange={props.handler}></input>
-      {props.error ? <span style={{ color: "red" }}><br />{props.error}</span> : ""}
+    <td className={tdStyle}>
+      <input className={inputStyle} name={name} size="12" placeholder={title} value={value} onChange={handler}></input>
+      {error ? <span style={{ color: "red" }}><br />{error}</span> : ""}
     </td>
   )
 }
