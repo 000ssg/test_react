@@ -295,19 +295,19 @@ function Table(props) {
             <tr className="TrA">
               <DrawEditCell name="add:name" title="Full name"
                 value={add.name} handler={api.change} error={addErrors.name}
-                tdStyle="TdAA" inputStyle="AInput"
+                tdStyle="TdAA" inputStyle="AddInput"
               />
               <DrawEditCell name="add:email" title="E-mail address"
                 value={add.email} handler={api.change} error={addErrors.email}
-                tdStyle="TdAA" inputStyle="AInput"
+                tdStyle="TdAA" inputStyle="AddInput"
               />
               <DrawEditCell name="add:phone" title="Phone number"
                 value={add.phone} handler={api.change} error={addErrors.phone}
-                tdStyle="TdAA" inputStyle="AInput"
+                tdStyle="TdAA" inputStyle="AddInput"
               />
               <td className="TdAA" valign="middle">
-                <div className="ACell">
-                  <input type="button" className="AButton" value="Add new" onClick={api.add}></input>
+                <div className="ActionCell">
+                  <input type="button" className="AddButton" value="Add new" onClick={api.add}></input>
                 </div>
               </td>
             </tr>
@@ -366,20 +366,20 @@ function DrawTableRow(props) {
       <tr className="TrE" {...row.getRowProps()}>
         <DrawEditCell name={"modify:name:" + row.values.id} title="Full name"
           value={modify.name} handler={api.change} error={modifyErrors.name}
-          tdStyle="TdE" inputStyle="EInput"
+          tdStyle="TdE" inputStyle="EditInput"
         />
         <DrawEditCell name={"modify:email:" + row.values.id} title="E-mail address"
           value={modify.email} handler={api.change} error={modifyErrors.email}
-          tdStyle="TdE" inputStyle="EInput"
+          tdStyle="TdE" inputStyle="EditInput"
         />
         <DrawEditCell name={"modify:phone:" + row.values.id} title="Phone number"
           value={modify.phone} handler={api.change} error={modifyErrors.phone}
-          tdStyle="TdE" inputStyle="EInput"
+          tdStyle="TdE" inputStyle="EditInput"
         />
         <td className="TdA" valign="middle">
-          <div className="ACell">
-            <input type="button" className="ECButton" name={"cancel:" + row.values.id} value="Cancel" onClick={api.cancel}></input>
-            <input type="button" className="ESButton" name={"save:" + row.values.id} value="Save" onClick={api.save}></input>
+          <div className="ActionCell">
+            <input type="button" className="ECancelButton" name={"cancel:" + row.values.id} value="Cancel" onClick={api.cancel}></input>
+            <input type="button" className="ESaveButton" name={"save:" + row.values.id} value="Save" onClick={api.save}></input>
           </div>
         </td>
       </tr>)
@@ -391,16 +391,20 @@ function DrawTableRow(props) {
           row.cells.map(cell => {
             // Apply the cell props
             return (
-              <td className="TdD" {...cell.getCellProps()}><div className="TdCell">
+              <td className="TdD" {...cell.getCellProps()}><div className="DataCell">
                 {// Render the cell contents
                   cell.render('Cell')}</div>
               </td>
             )
           })}
         <td className="TdA">
-          <div className="IACell">
-            <button className="TdAEButton" onClick={api.select} value={row.values.id}><img src={editIcon} className="TdAIcon" alt="edit" /></button>
-            <button className="TdADButton" onClick={api.delete} value={row.values.id}><img src={deleteIcon} className="TdAIcon" alt="delete" /></button>
+          <div className="EditActionCell">
+            <button className="EditButton" onClick={api.select} value={row.values.id}>
+              <img src={editIcon} className="ActionIcon" alt="edit" />
+            </button>
+            <button className="DeleteButton" onClick={api.delete} value={row.values.id}>
+              <img src={deleteIcon} className="ActionIcon" alt="delete" />
+            </button>
           </div>
         </td>
       </tr>
