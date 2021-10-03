@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Actions
 
-Optional: modify src/data.jon for initial set of participants
+Optional: modify src/data.json for initial set of participants
 
 ### 'npm install' to resolve dependencies
 ### `npm start` to play
