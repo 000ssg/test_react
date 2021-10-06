@@ -66,21 +66,15 @@ class App extends React.Component {
    * @param {*} event 
    */
   handleAdd(event) {
-    console.debug("adding: " + event.target.value + ", " + JSON.stringify(this.state.add))
     const errors = this.validateInput(this.state.add)
     const hasError = errors.name || errors.email || errors.phone;
-    if (this.state.add && !hasError) {
-      // eval next id
-      const newId = this.state.data
-        .map(item => parseInt("" + item.id))
-        .reduce((acc, val) => val > acc ? val : acc, 0) + 1;
-
+    if (!hasError) {
       this.setState({
         data: this.state.data.concat({
-          id: "" + newId,
-          name: this.state.add.name,
-          email: this.state.add.email,
-          phone: this.state.add.phone
+          id: "" + this.state.data
+            .map(item => parseInt("" + item.id))
+            .reduce((acc, val) => val > acc ? val : acc, 0) + 1,
+          ...this.state.add
         }),
         add: { name: "", email: "", phone: "" },
         addErrors: {},
@@ -98,12 +92,11 @@ class App extends React.Component {
    * @param {*} event 
    */
   handleSelect(event) {
-    console.debug("select: " + event.target.value)
     const itemId = event.target.value
     const item = this.state.data.find(item => item.id === itemId)
     if (item) {
       this.setState({
-        modify: Object.assign({}, item),
+        modify: { ...item },
         modifyErrors: {},
       })
     }
@@ -111,82 +104,51 @@ class App extends React.Component {
 
   /**
    * Modify value for new (add) or modified entry's single attribute.
-   * Expects target name in form: "<entry>:<field>[:<id>]" where entry is "add" or"modify".
+   * Expects target name in form: "<entry>:<field>" where entry is "add" or"modify".
    * @param {*} event 
    */
   handleChange(event) {
-    console.debug("change: " + event.target.name + ", " + event.target.value)
     const [entryName, fieldName] = event.target.name.split(":");
 
     if (entryName && fieldName) {
-      switch (entryName) {
-        case "add":
-        case "modify":
-          const entry = Object.assign({}, this.state[entryName]);
-          entry[fieldName] = event.target.value;
-          this.setState({ [entryName]: entry })
-          break;
-        default:
-          console.warn("unsupported entry: " + entryName);
-          break;
-      }
+      this.setState({ [entryName]: { ...this.state[entryName], [fieldName]: event.target.value } })
     }
   }
 
   /**
    * Save changes for modified entry, if valid.
-   * Uses target name in form: "<action>:<id>" (id -> to enable multi-row editing if desired)
    * @param {*} event 
    */
   handleSave(event) {
-    console.debug("save: " + event.target.value + "/" + event.target.name)
-    const [, itemId] = event.target.name.split(":");
-    const item = itemId === this.state.modify.id
-      ? this.state.data.find(item => item.id === itemId)
-      : null;
-
+    const item = this.state.data.find(item => item.id === this.state.modify.id);
     const errors = this.validateInput(this.state.modify)
     const hasError = errors.name || errors.email || errors.phone;
 
     if (!hasError) {
-      if (item) {
-        console.debug("modified: " + itemId); //+" "+JSON.stringify(item) +" -> "+JSON.stringify(this.state.modify))
-        Object.assign(item, this.state.modify);
+      Object.assign(item, this.state.modify);
 
-        this.setState({
-          data: this.state.data.slice(),
-          modify: {},
-          modifyErrors: {},
-        })
-        this.saveData()
-      }
+      this.setState({
+        data: this.state.data.slice(),
+        modify: {},
+        modifyErrors: {},
+      })
+      this.saveData()
     } else {
-      if (item) {
-        this.setState({
-          modifyErrors: errors
-        })
-      }
+      this.setState({
+        modifyErrors: errors
+      })
     }
   }
 
   /**
    * Cancel entry modification
-   * Uses target name in form: "<action>:<id>" (id -> to enable multi-row editing if desired)
    * @param {*} event 
    */
   handleCancel(event) {
-    console.debug("cancel: " + event.target.value + "/" + event.target.name)
-    const [, itemId] = event.target.name.split(":");
-    const item = itemId === this.state.modify.id
-      ? this.state.data.find(item => item.id === itemId)
-      : null;
-
-    if (item) {
-      this.setState({
-        modify: {},
-        modifyErrors: {},
-      })
-    }
+    this.setState({
+      modify: {},
+      modifyErrors: {},
+    })
   }
 
   /**
@@ -194,10 +156,8 @@ class App extends React.Component {
    * @param {*} event 
    */
   handleDelete(event) {
-    console.debug("delete: " + event.target.value)
-    const itemId = event.target.value
     this.setState({
-      data: this.state.data.filter(a => itemId !== a.id),
+      data: this.state.data.filter(a => a.id !== event.target.value),
       modify: {},
       modifyErrors: {},
     })
@@ -337,13 +297,10 @@ function Table(props) {
               rows.map(row => {
                 // Prepare the row for display
                 prepareRow(row)
-                return (<DrawTableRow
-                  key={row.values.id}
-                  row={row}
-                  modify={modify}
-                  modifyErrors={modifyErrors}
-                  api={api}
-                />)
+                return (modify && modify.id === row.values.id
+                  ? <DrawInlineEditRow row={row} api={api} modify={modify} modifyErrors={modifyErrors} />
+                  : <DrawDataRow row={row} api={api} />
+                )
               })}
           </tbody>
         </table>        </div>
@@ -351,64 +308,69 @@ function Table(props) {
   );
 }
 
-function DrawTableRow(props) {
-  let {
+function DrawDataRow(props) {
+  const {
+    row,
+    api
+  } = props;
+
+  return (
+    // Apply the row props
+    <tr className="TrD" {...row.getRowProps()}>
+      {// Loop over the rows cells
+        row.cells.map(cell => {
+          // Apply the cell props
+          return (
+            <td className="TdD" {...cell.getCellProps()}><div className="DataCell">
+              {// Render the cell contents
+                cell.render('Cell')}</div>
+            </td>
+          )
+        })}
+      <td className="TdA">
+        <div className="EditActionCell">
+          <button className="EditButton" onClick={api.select} value={row.values.id}>
+            <img src={editIcon} className="ActionIcon" alt="edit" />
+          </button>
+          <button className="DeleteButton" onClick={api.delete} value={row.values.id}>
+            <img src={deleteIcon} className="ActionIcon" alt="delete" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+function DrawInlineEditRow(props) {
+  const {
     row,
     api,
     modify,
     modifyErrors
   } = props;
 
-  const isEditRow = modify && modify.id === row.values.id;
-  //console.debug("TableRow.render: " + row.values.id+"/edit="+isEditRow);
-  if (isEditRow) {
-    return (
-      <tr className="TrE" {...row.getRowProps()}>
-        <DrawEditCell name={"modify:name:" + row.values.id} title="Full name"
-          value={modify.name} handler={api.change} error={modifyErrors.name}
-          tdStyle="TdE" inputStyle="EditInput"
-        />
-        <DrawEditCell name={"modify:email:" + row.values.id} title="E-mail address"
-          value={modify.email} handler={api.change} error={modifyErrors.email}
-          tdStyle="TdE" inputStyle="EditInput"
-        />
-        <DrawEditCell name={"modify:phone:" + row.values.id} title="Phone number"
-          value={modify.phone} handler={api.change} error={modifyErrors.phone}
-          tdStyle="TdE" inputStyle="EditInput"
-        />
-        <td className="TdA" valign="middle">
-          <div className="ActionCell">
-            <input type="button" className="ECancelButton" name={"cancel:" + row.values.id} value="Cancel" onClick={api.cancel}></input>
-            <input type="button" className="ESaveButton" name={"save:" + row.values.id} value="Save" onClick={api.save}></input>
-          </div>
-        </td>
-      </tr>)
-  } else
-    return (
-      // Apply the row props
-      <tr className="TrD" {...row.getRowProps()}>
-        {// Loop over the rows cells
-          row.cells.map(cell => {
-            // Apply the cell props
-            return (
-              <td className="TdD" {...cell.getCellProps()}><div className="DataCell">
-                {// Render the cell contents
-                  cell.render('Cell')}</div>
-              </td>
-            )
-          })}
-        <td className="TdA">
-          <div className="EditActionCell">
-            <button className="EditButton" onClick={api.select} value={row.values.id}>
-              <img src={editIcon} className="ActionIcon" alt="edit" />
-            </button>
-            <button className="DeleteButton" onClick={api.delete} value={row.values.id}>
-              <img src={deleteIcon} className="ActionIcon" alt="delete" />
-            </button>
-          </div>
-        </td>
-      </tr>
-    )
+  return (
+    <tr className="TrE" {...row.getRowProps()}>
+      <DrawEditCell name="modify:name" title="Full name"
+        value={modify.name} handler={api.change} error={modifyErrors.name}
+        tdStyle="TdE" inputStyle="EditInput"
+      />
+      <DrawEditCell name="modify:email" title="E-mail address"
+        value={modify.email} handler={api.change} error={modifyErrors.email}
+        tdStyle="TdE" inputStyle="EditInput"
+      />
+      <DrawEditCell name="modify:phone" title="Phone number"
+        value={modify.phone} handler={api.change} error={modifyErrors.phone}
+        tdStyle="TdE" inputStyle="EditInput"
+      />
+      <td className="TdA" valign="middle">
+        <div className="ActionCell">
+          <input type="button" className="ECancelButton" value="Cancel" onClick={api.cancel}></input>
+          <input type="button" className="ESaveButton" value="Save" onClick={api.save}></input>
+        </div>
+      </td>
+    </tr>
+  )
 }
 
 
